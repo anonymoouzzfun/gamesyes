@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>fart simulator</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        body {
+            background-color: #ffb643;
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        #game-card {
+            background-color: #cb984c;
+            width: 480px;
+            padding: 45px 20px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+        }
+
+        h1 {
+            color: #ffffff;
+            font-size: 42px;
+            margin: 0 0 10px 0;
+            font-weight: bold;
+        }
+
+        p {
+            color: #ffffff;
+            font-size: 16px;
+            margin: 0 0 35px 0;
+        }
+
+        #counter {
+            color: #ffffff;
+            font-size: 62px;
+            font-weight: bold;
+            margin-bottom: 40px;
+        }
+
+        .btn-container {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        button {
+            font-family: Arial, sans-serif;
+            font-size: 18px;
+            color: #ffffff;
+            border: none;
+            padding: 14px 24px;
+            border-radius: 10px;
+            cursor: pointer;
+            box-shadow: 0 4px 0 rgba(0, 0, 0, 0.15);
+        }
+
+        #fart-btn {
+            background-color: #ff4a22;
+        }
+
+        #fart-btn:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 0 rgba(0, 0, 0, 0.15);
+        }
+
+        #screenshot-btn {
+            background-color: #41b05d;
+        }
+
+        #screenshot-btn:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 0 rgba(0, 0, 0, 0.15);
+        }
+    </style>
+</head>
+<body>
+
+    <div id="game-card">
+        <h1>fart simulator</h1>
+        <p>made by team anonymoouzz</p>
+        <div id="counter">Farts: 0</div>
+        <div class="btn-container">
+            <button id="fart-btn" onclick="fart()">Fart</button>
+            <button id="screenshot-btn" onclick="screenshot()">Screenshot your score</button>
+        </div>
+    </div>
+
+    <script>
+        var count = 0;
+
+        function fart() {
+            count++;
+            document.getElementById("counter").innerHTML = "Farts: " + count;
+
+            var audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            var osc = audioCtx.createOscillator();
+            var gain = audioCtx.createGain();
+            var filter = audioCtx.createBiquadFilter();
+
+            osc.type = "sawtooth";
+            var pitch = 60 + Math.random() * 15;
+            osc.frequency.setValueAtTime(pitch, audioCtx.currentTime);
+            osc.frequency.linearRampToValueAtTime(pitch - 20, audioCtx.currentTime + 0.4);
+
+            gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
+
+            filter.type = "lowpass";
+            filter.frequency.setValueAtTime(280, audioCtx.currentTime);
+
+            osc.connect(filter);
+            filter.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.4);
+        }
+
+        function screenshot() {
+            var element = document.getElementById("game-card");
+            html2canvas(element, { backgroundColor: "#ffb643" }).then(function(canvas) {
+                var link = document.createElement("a");
+                link.download = "fart_score.png";
+                link.href = canvas.toDataURL();
+                link.click();
+            });
+        }
+    </script>
+
+</body>
+</html>
